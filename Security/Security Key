@@ -1,7 +1,0 @@
-API keys can be used to control access. It also allows metering or tracking API uses by clients.
-
-Swagger + API Gateway Extensions
-https://github.com/vishaldesai/AWS_API_Gateway/blob/master/Security/Security_Key-prod-swagger-apigateway.json
-
-Test using postman
-
