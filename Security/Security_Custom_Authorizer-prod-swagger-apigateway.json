@@ -1,0 +1,117 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2017-11-13T03:06:23Z",
+    "title": "Security_Custom_Authorizer"
+  },
+  "host": "l4y1rtmoi5.execute-api.us-east-1.amazonaws.com",
+  "basePath": "/prod",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/awscloud": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "LambdaAuthorizer",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "Security_Lambda_Authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestParameters": {
+            "integration.request.header.LambdaAuthorizer": "method.request.header.LambdaAuthorizer"
+          },
+          "uri": "https://aws.amazon.com",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http"
+        }
+      }
+    },
+    "/oraclecloud": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "LambdaAuthorizer",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "Security_Lambda_Authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestParameters": {
+            "integration.request.header.LambdaAuthorizer": "method.request.header.LambdaAuthorizer"
+          },
+          "uri": "https://www.oracle.com/index.html",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Security_Lambda_Authorizer": {
+      "type": "apiKey",
+      "name": "LambdaAuthorizer",
+      "in": "header",
+      "x-amazon-apigateway-authtype": "custom",
+      "x-amazon-apigateway-authorizer": {
+        "authorizerUri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:084009911244:function:API_Security_Lambda_Authorizer/invocations",
+        "authorizerResultTtlInSeconds": 0,
+        "type": "token"
+      }
+    }
+  },
+  "definitions": {
+    "Empty": {
+      "type": "object",
+      "title": "Empty Schema"
+    }
+  }
+}
