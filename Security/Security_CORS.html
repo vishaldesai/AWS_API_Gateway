@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <script type="text/javascript">
+        function functionOne() { 
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://giqh4emdt7.execute-api.ca-central-1.amazonaws.com/dev", false);
+            xhr.send();
+            alert('Status:' + xhr.status + ' ' + xhr.responseText);
+         }
+        function functionTwo() { 
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://v8f5ejz822.execute-api.ca-central-1.amazonaws.com/dev", false);
+
+                try { 
+                    xhr.send();
+                }
+                catch (err) {
+                    alert('Status:' + err);
+                }
+            alert('Status:' + xhr.status + ' ' + xhr.responseText);
+         }
+    </script>
+</head>
+
+<body>
+    <p>
+        <a href="#" onClick="functionOne();">CORS enabled API</a>
+    </p>
+    <p>
+        <a href="javascript:functionTwo();">CORS disabled API</a>
+    </p>
+</body>
+
+</html>
