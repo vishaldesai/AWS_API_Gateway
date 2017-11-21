@@ -1,4 +1,4 @@
-# API Gateway Sample Programs
+# API Gateway Code/Prototypes
 
 Each link below has swagger definition file which can be imported while creating API to demonstrate various features for API gateway.
 
