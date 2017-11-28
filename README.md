@@ -16,6 +16,8 @@ CORS - https://github.com/vishaldesai/AWS_API_Gateway/wiki/CORS <br />
 
 Account and Stack creation automation - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Account-and-Stack-creation-automation <br />
 
+**Developer:**
 
+Avoid callback hell using async - https://github.com/vishaldesai/AWS_API_Gateway/wiki/async-to-avoid-callback-hell
 
 
