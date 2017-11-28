@@ -1,0 +1,21 @@
+{
+  "name": "Series_And_Parallel",
+  "version": "1.0.0",
+  "description": "This Lambda function will show how to use Series and parallel pattern",
+  "main": "index.js",
+  "scripts": {
+    "test": "run-local-lambda --file index.js --event tests/event.json",
+    "deploy": "aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:084009911244:function:Series_And_Parallel --zip-file fileb://Lambda-Deployment_async_wf.zip",
+    "predeploy": "zip -r Lambda-Deployment_async_wf.zip * -x *.zip  *.log"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "aws-sdk": "^2.3.2",
+    "log": "^1.4.0"
+  },
+  "author": "Peter Sbarski",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "run-local-lambda": "^1.1.0"
+  }
+}
