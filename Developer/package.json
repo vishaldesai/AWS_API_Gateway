@@ -13,7 +13,7 @@
     "aws-sdk": "^2.3.2",
     "log": "^1.4.0"
   },
-  "author": "Peter Sbarski",
+  "author": "Vishal Desai",
   "license": "BSD-2-Clause",
   "devDependencies": {
     "run-local-lambda": "^1.1.0"
