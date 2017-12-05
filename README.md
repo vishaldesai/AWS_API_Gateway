@@ -20,4 +20,6 @@ Account and Stack creation automation - https://github.com/vishaldesai/AWS_API_G
 
 Avoid callback hell using async - https://github.com/vishaldesai/AWS_API_Gateway/wiki/async-to-avoid-callback-hell
 
+Vault prototype using DyanmoDB and KMS - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Vault-prototype-using-KMS-and-DynamoDB
+
 
