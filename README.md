@@ -23,4 +23,6 @@ Avoid callback hell using async - https://github.com/vishaldesai/AWS_API_Gateway
 
 Vault prototype using DyanmoDB and KMS - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Vault-prototype-using-KMS-and-DynamoDB
 
+Mapping Template and Proxy Integration - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Mapping-Template-&-Proxy-Integration
+
 
