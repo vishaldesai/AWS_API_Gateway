@@ -11,6 +11,7 @@ IAM - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-IAM <br />
 Cognito - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-Cognito <br />
 Custom Authorizer - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-Custom-Authorizer <br />
 CORS - https://github.com/vishaldesai/AWS_API_Gateway/wiki/CORS <br />
+Generate Signature - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Generate-Signature-V4 <br />
 
 **Organizations:**
 
