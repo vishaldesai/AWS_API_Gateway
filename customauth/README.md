@@ -89,6 +89,210 @@ variable "create_user_pool_client_file" {
 }
 ```
 
+File: main.tf
+
+```
+provider "aws" {
+   region = "${var.aws_region}"
+}
+
+resource "aws_cognito_user_pool" "pool" {
+  name = "mycognitopool1"
+}
+
+
+resource "null_resource" "aws_cognito_create_resource_server" {
+provisioner "local-exec" {
+    command = <<EOF
+    aws cognito-idp create-resource-server --user-pool-id ${aws_cognito_user_pool.pool.id} --cli-input-json ${var.create_resource_server_file}
+    EOF
+    }
+}
+
+resource "aws_cognito_user_pool_domain" "main" {
+  domain = "mycogpool1"
+  user_pool_id = "${aws_cognito_user_pool.pool.id}"
+}
+
+
+resource "null_resource" "aws_cognito_create_user_pool_client" {
+provisioner "local-exec" {
+    command = <<EOF
+    aws cognito-idp create-user-pool-client --user-pool-id ${aws_cognito_user_pool.pool.id} --cli-input-json ${var.create_user_pool_client_file}
+    EOF
+    }
+}
+```
+
+File: create-user-pool-client.json
+
+```
+{
+    "UserPoolId": "",
+    "ClientName": "validate",
+    "GenerateSecret": false,
+    "RefreshTokenValidity": 0,
+    "ExplicitAuthFlows": [
+        "ADMIN_NO_SRP_AUTH",
+        "USER_PASSWORD_AUTH"
+    ],
+    "SupportedIdentityProviders": [
+        "COGNITO"
+    ],
+    "CallbackURLs": [
+        "https://validate.com/"
+    ],
+    "LogoutURLs": [
+        "https://validate.com/"
+    ],
+    "AllowedOAuthFlows": [
+        "code"
+    ],
+    "AllowedOAuthScopes": [
+        "https://resource1/get",
+        "https://resource1/post"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true
+}
+```
+
+File: create-resource-server.json
+
+```
+{
+    "UserPoolId": "",
+    "Identifier": "https://resource1",
+    "Name": "resource",
+    "Scopes": [
+        {
+            "ScopeName": "get",
+            "ScopeDescription": "allow gets"
+        },
+        {
+            "ScopeName": "post",
+            "ScopeDescription": "allow posts"
+        }
+    ]
+}
+```
+
+## A2. API Gateway Swagger template
+
+```
+---
+swagger: "2.0"
+info:
+  version: "2018-03-21T17:11:25Z"
+  title: "Security_CognitoOAuthScopes1"
+host: "3lgc533c.execute-api.us-east-1.amazonaws.com"
+basePath: "/dev"
+schemes:
+- "https"
+paths:
+  /read:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "access_token"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "password"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "username"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - customv1: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.querystring.password: "method.request.querystring.password"
+          integration.request.querystring.access_token: "method.request.querystring.access_token"
+          integration.request.querystring.username: "method.request.querystring.username"
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:xxxx:function:HelloRead/invocations"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "{\n    \"access_token\" : \"$input.params('access_token')\"\
+            ,\n    \"username\" : \"$input.params('username')\",\n    \"password\"\
+            \ : \"$input.params('password')\"\n}"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /write:
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "access_token"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "password"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "username"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - customv1: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.querystring.password: "method.request.querystring.password"
+          integration.request.querystring.access_token: "method.request.querystring.access_token"
+          integration.request.querystring.username: "method.request.querystring.username"
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:xxxx:function:HelloWrite/invocations"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "{\n    \"access_token\" : \"$input.params('access_token')\"\
+            ,\n    \"username\" : \"$input.params('username')\",\n    \"password\"\
+            \ : \"$input.params('password')\"\n}"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+securityDefinitions:
+  customv1:
+    type: "apiKey"
+    name: "Unused"
+    in: "header"
+    x-amazon-apigateway-authtype: "custom"
+    x-amazon-apigateway-authorizer:
+      authorizerCredentials: "arn:aws:iam::xxxx:role/service-role/Admintest"
+      authorizerUri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:xxxx:function:cloud9-buildauthorizev2-buildauthorizev2-abc/invocations"
+      authorizerResultTtlInSeconds: 0
+      type: "request"
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"
+```
+
+
 
 
 
