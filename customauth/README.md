@@ -176,7 +176,7 @@ File: create-resource-server.json
 }
 ```
 
-## A2. API Gateway Swagger template
+### A2. API Gateway Swagger template
 
 ```
 ---
@@ -291,6 +291,177 @@ definitions:
     type: "object"
     title: "Empty Schema"
 ```
+
+### A3. Authorization Code Grant Script
+
+```
+#!/usr/bin/env bash
+
+#===============================================================================
+# CLIENT CREDENTIALS GRANT
+#===============================================================================
+
+## Set constants ##
+AUTH_DOMAIN="xxxx.auth.us-east-1.amazoncognito.com" # Update MYDOMAIN and REGION
+CLIENT_ID="xxxx" # Replace with app client ID
+CLIENT_SECRET="xxxx" # Replace with app client secret
+GRANT_TYPE="client_credentials"
+
+## Get access token from /oauth2/token endpoint ##
+authorization="$(printf "${CLIENT_ID}:${CLIENT_SECRET}" \
+                    | base64 \
+                    | tr -d "\n"
+                )"
+
+
+
+curl "https://${AUTH_DOMAIN}/oauth2/token" \
+    -H "Authorization: Basic ${authorization}" \
+    -d "grant_type=${GRANT_TYPE}"
+```
+
+### A4. Lambda for API custom authorizer.
+
+```
+import boto3
+import requests
+import json
+import time
+from boto3.dynamodb.conditions import Key, Attr
+from jose import jwk, jwt
+from jose.utils import base64url_decode
+from warrant import Cognito
+from botocore.exceptions import ClientError
+
+def access_token_validation(token):
+    
+    # Define region and app userpool id
+    region = 'us-east-1'
+    userpool_id = 'us-east-1_wekRrmrtl'
+    keys_url = 'https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json'.format(region, userpool_id)
+
+    response = requests.get(keys_url)
+    keys = json.loads(response.text)['keys']
+    
+    headers = jwt.get_unverified_headers(token)
+
+    kid = headers['kid']
+
+    # search for the kid in the downloaded public keys
+    key_index = -1
+    for i in range(len(keys)):
+        if kid == keys[i]['kid']:
+            key_index = i
+            break
+
+    if key_index == -1:
+        print('Public key not found in jwks.json');
+        return False
+
+    # construct the public key
+    public_key = jwk.construct(keys[key_index])
+    # get the last two sections of the token,
+    # message and signature (encoded in base64)
+    message, encoded_signature = str(token).rsplit('.', 1)
+    # decode the signature
+    decoded_signature = base64url_decode(encoded_signature.encode())
+
+    # verify the signature
+    if not public_key.verify(message.encode(), decoded_signature):
+        return False
+    else:
+        return jwt.get_unverified_claims(token)
+    
+
+def lambda_handler(event, context):
+    print(event)
+    for key,value in event.items():
+        if key == "queryStringParameters":
+            access_token = value.get('access_token') 
+            username = value.get('username')
+            password = value.get('password')
+
+    print("1")
+    if access_token is not None:
+        print("2")
+        try:
+            token_claims=access_token_validation(access_token)
+            client_id = token_claims.get('client_id')
+            scope     = token_claims.get('scope')
+        except ClientError as e:
+            print(e)
+            raise Exception('Unauthorized token')
+
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        table = dynamodb.Table('customauthorizer')
+
+        try:
+            response = table.query(
+                KeyConditionExpression=Key('id').eq(client_id) & Key('scope').eq(scope)
+            )
+            print("3")
+            for i in response['Items']:
+                policydoc=json.loads(i['policydoc'])
+                return policydoc
+        except ClientError as e:
+            print(e)
+
+            
+    elif ( username is not None and password is not None ):
+        
+        u = Cognito('us-east-1_wekRrmrtl','6b25dg5amg6eqjl3h6aab5t601',  username=username)
+    
+        try:
+            u.authenticate(password=password)
+        except ClientError as e:
+            print(e)
+            raise Exception('Unauthorized username/password')
+        
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        table = dynamodb.Table('customauthorizer')
+        
+        try:
+            response = table.query(
+                KeyConditionExpression=Key('id').eq(username)
+                )
+
+            for i in response['Items']:
+                policydoc=json.loads(i['policydoc'])
+                return policydoc
+                    
+        except ClientError as e:
+            print(e)
+            
+        
+    else:
+        print("Provide username/password or access_token")
+```            
+        
+## A5. Policy Document
+
+```
+{
+  "principalId": "user|a1b2c3d4",
+  "policyDocument": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "execute-api:Invoke",
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:execute-api:us-east-1:xxx:3lgc5v3c/*/POST/write"
+        ]
+      }
+    ]
+  },
+  "context": {
+    "key": "value",
+    "number": 1,
+    "bool": true
+  }
+}
+```
+
 
 
 
