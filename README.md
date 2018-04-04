@@ -10,8 +10,10 @@ API Key - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-Key <br /
 IAM - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-IAM <br />
 Cognito - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-Cognito <br />
 Custom Authorizer - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Security-Custom-Authorizer <br />
+Custom Authorizer and Cognito User Pool - https://github.com/vishaldesai/AWS_API_Gateway/blob/master/customauth/README.md <br />
 CORS - https://github.com/vishaldesai/AWS_API_Gateway/wiki/CORS <br />
 Generate Signature - https://github.com/vishaldesai/AWS_API_Gateway/wiki/Generate-Signature-V4 <br />
+
 
 **Organizations:**
 
